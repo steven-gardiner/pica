@@ -2,7 +2,8 @@
   "name": "pica",
   "dependencies": {
     "piphone": "git://github.com/steven-gardiner/piphone.git",
-    "gpiobutton": "*"
+    "gpiobutton": "*",
+    "gpio": "*"
   },  
   "bin": {
     "pica": "./pica.js"
