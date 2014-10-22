@@ -14,6 +14,9 @@ process.on('tts', function(spec) {
 pica.pin4 = pica.mods.gpio.export(4, {direction:'in', ready:function() {
   process.emit('tts', {tosay:['ready', 'freddy', 4]});
 }});
+pica.pin17 = pica.mods.gpio.export(17, {direction:'out', ready:function() {
+  process.emit('tts', {tosay:['ready', 'freddy', 17]});
+}});
 pica.pin22 = pica.mods.gpio.export(22, {direction:'in', ready:function() {
   process.emit('tts', {tosay:['ready', 'freddy', 22]});
 }});
@@ -27,4 +30,9 @@ pica.pin22.on('change', function(val) {
 
 setInterval(function() {
   process.emit('tts', {tosay:['hear', 'ye', 4, pica.pin4.value]});
-}, 2000);
+}, 5000);
+
+setInterval(function() {
+  process.emit('tts', {tosay:['hear', 'ye', 17, pica.pin17.value]});
+  pica.pin17.set(!pica.pin17.value);
+}, 17500);
