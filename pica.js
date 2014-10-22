@@ -24,3 +24,7 @@ pica.pin4.on('change', function(val) {
 pica.pin22.on('change', function(val) {
   process.emit('tts', {tosay:['change', 22, val]});
 });
+
+setTimeout(function() {
+  process.emit('tts', {tosay:['hear', 'ye', 4, pica.pin4.value]});
+}, 2000);
