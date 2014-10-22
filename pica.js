@@ -31,7 +31,8 @@ pica.pin22.on('change', function(val) {
 
 setInterval(function() {
   //process.emit('tts', {tosay:['hear', 'ye', 4, pica.pin4.value]});
-}, 5000);
+  console.error("NOW: %j", {value:pica.pin4.value, fresh: pica.ping4._get()});
+}, 500);
 
 setInterval(function() {
   return;
