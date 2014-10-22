@@ -36,4 +36,4 @@ setInterval(function() {
 setInterval(function() {
   process.emit('tts', {tosay:['hear', 'ye', 17, pica.pin17.value]});
   pica.pin17.set((1*!pica.pin17.value));
-}, 17500);
+}, 5000);
