@@ -14,6 +14,7 @@ process.on('tts', function(spec) {
 
 pica.pin16 = pica.mods.gpio.export(16, {direction:'out', ready:function() {
   process.emit('tts', {tosay:['ready', 'freddy', 16]});
+  pica.pin16.set();
 }});
 pica.pin21 = pica.mods.gpio.export(21, {direction:'in', ready:function() {
   process.emit('tts', {tosay:['ready', 'freddy', 21]});
@@ -23,4 +24,3 @@ pica.pin21.on('change', function(val) {
   process.emit('tts', {tosay:['change', 21, val]});
 });
 
-pica.pin16.set();
