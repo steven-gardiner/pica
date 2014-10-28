@@ -24,3 +24,15 @@ pica.pin21.on('change', function(val) {
   process.emit('tts', {tosay:['change', 21, val]});
 });
 
+pica.pin17 = pica.mods.gpio.export(17, {direction:'out', ready:function() {
+  process.emit('tts', {tosay:['ready', 'freddy', 17]});
+  pica.pin17.set();
+}});
+pica.pin22 = pica.mods.gpio.export(22, {direction:'in', ready:function() {
+  process.emit('tts', {tosay:['ready', 'freddy', 22]});
+}});
+
+pica.pin22.on('change', function(val) {
+  process.emit('tts', {tosay:['change', 22, val]});
+});
+
