@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 
-cat /tmp/foo
+# cat /tmp/foo
 

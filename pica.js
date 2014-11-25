@@ -1,38 +1,95 @@
 #!/usr/bin/env node
 
-var pica = {};
+module.exports = function() {
+  "use strict";
 
-pica.mods = {};
-pica.mods.gpio = require('gpio');
-pica.mods.cp = require('child_process');
-process.on('tts', function(spec) {
-  console.error("SAY: %j", spec.tosay);
-  var tts = pica.mods.cp.spawn('tts', spec.tosay);
-  tts.stdout.pipe(process.stdout);
-  tts.stderr.pipe(process.stderr);
-});
+  var pica = {};
 
-pica.pin16 = pica.mods.gpio.export(16, {direction:'out', ready:function() {
-  process.emit('tts', {tosay:['ready', 'freddy', 16]});
-  pica.pin16.set();
-}});
-pica.pin21 = pica.mods.gpio.export(21, {direction:'in', ready:function() {
-  process.emit('tts', {tosay:['ready', 'freddy', 21]});
-}});
+  pica.mods = {};
+  pica.mods.cp = require('child_process');
+  pica.mods.http = require('http');
+  pica.mods.nomnom = require('nomnom');
+  pica.mods.keypad = require('./keypad.js');
+  pica.mods.parseurl = require('url').parse;
+  
+  pica.commandset = {
+    "2": ["weather"],
+    "3": ["suntime"],
+    "9": ["gross"],
+  };
+  
+  pica.Pica = function(spec) {
+    var self = {};
 
-pica.pin21.on('change', function(val) {
-  process.emit('tts', {tosay:['change', 21, val]});
-});
+    spec = spec || {};
+    self.eq = spec.eq || process;   
+    
+    self.parser = pica.mods.nomnom();
 
-pica.pin17 = pica.mods.gpio.export(17, {direction:'out', ready:function() {
-  process.emit('tts', {tosay:['ready', 'freddy', 17]});
-  pica.pin17.set();
-}});
-pica.pin22 = pica.mods.gpio.export(22, {direction:'in', ready:function() {
-  process.emit('tts', {tosay:['ready', 'freddy', 22]});
-}});
+    self.parser.nocommand({});
+    for (var key in pica.commandset) {
+      self.parser.command(key, {});
+      //console.error("ADDCMD: %s", key);
+    }
 
-pica.pin22.on('change', function(val) {
-  process.emit('tts', {tosay:['change', 22, val]});
-});
+    self.organ = require("organ").listen(spec);
+    
+    self.eq.on('pica_parse', function(parseSpec) {
+      var doSpec = Object.create(parseSpec);
+      doSpec.args = parseSpec.args || process.argv.slice(2);
+      doSpec.args = doSpec.args.map(function(x) { return x.toString(); });
+      doSpec.opts = self.parser.parse(doSpec.args);
+        console.error("PRADO: %j", doSpec);
+      if (doSpec.opts["_"].length > 0) {
+        doSpec.picaname = doSpec.opts["_"][0];
+        doSpec.cmd = pica.commandset[doSpec.picaname];
+        console.error("DO: %j", doSpec);
 
+        self.eq.emit('organ_parse', doSpec);
+      } else {
+	self.eq.emit('pica_serve', doSpec);
+      }
+    });
+
+    self.serve = function(req, resp) {
+      var spec = {};
+      spec.url = pica.mods.parseurl(req.url);
+      spec.path = spec.url.path.split("/");
+      
+
+      if ((spec.path.length !== 2) || (spec.path[0] !== '')) {
+	resp.writeHead(404, {"Content-Type": "text/plain"});
+	resp.end();
+	return;
+      }
+
+      spec.cmdname = spec.path[1];
+      console.error("SERVE %j", spec);
+
+      self.eq.emit('pica_parse', {args: [spec.cmdname], output:resp});
+    };
+    
+    self.eq.on('pica_serve', function(serveSpec) {
+      self.keypad = new pica.mods.keypad.Keypad(serveSpec);
+      self.http = pica.mods.http.createServer(self.serve).listen(3142);
+    });
+    
+    return self;
+  };
+
+  pica.listen = function(emitter) {
+    return new pica.Pica({eq:emitter});
+  };
+
+  return pica;
+}();
+
+var pica = module.exports;
+
+if (module.parent) {
+} else {
+  var p = pica.listen(process);
+  setTimeout(function() {
+      process.emit("pica_parse", {output:process.stdout, args:process.argv.slice(2)});
+    }, 1000);
+}
