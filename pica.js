@@ -51,6 +51,10 @@ module.exports = function() {
       }
     });
 
+    self.eq.on('keypress', function(spec) {
+      console.error("PICAKEY: %j", spec);
+    });
+    
     self.serve = function(req, resp) {
       var spec = {};
       spec.url = pica.mods.parseurl(req.url);

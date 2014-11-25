@@ -10,12 +10,6 @@ kp.Keypad = function(spec) {
   self.spec = spec || {};
   self.eq = self.spec.eq || process;
 
-  self.eq.on('tts', function(spec) {
-    console.error("SAY: %j", spec.tosay);
-    var tts = kp.mods.cp.spawn('tts', spec.tosay);
-    tts.stdout.pipe(process.stdout);
-    tts.stderr.pipe(process.stderr);
-  });
   self.eq.on('keypress', function(spec) {
     console.error("KEY! %j", spec);
   });
