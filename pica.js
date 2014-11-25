@@ -53,6 +53,9 @@ module.exports = function() {
 
     self.eq.on('keypress', function(spec) {
       console.error("PICAKEY: %j", spec);
+
+      
+      self.eq.emit('pica_parse', {args: [spec.key], output:process.stdout});
     });
     
     self.serve = function(req, resp) {
