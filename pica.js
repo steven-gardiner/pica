@@ -38,6 +38,11 @@ module.exports = function() {
       var doSpec = Object.create(parseSpec);
       doSpec.args = parseSpec.args || process.argv.slice(2);
       doSpec.args = doSpec.args.map(function(x) { return x.toString(); });
+      doSpec.arg0 = doSpec.args[0];
+      if (doSpec.arg0 && (! pica.commandset[doSpec.arg0])) {
+	console.error("NOT SUPPORTED: %j", doSpec);
+	return;
+      }
       doSpec.opts = self.parser.parse(doSpec.args);
         console.error("PRADO: %j", doSpec);
       if (doSpec.opts["_"].length > 0) {
