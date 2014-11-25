@@ -3,7 +3,7 @@
   "dependencies": {
     "piphone": "git://github.com/steven-gardiner/piphone.git",
     "gpiobutton": "*",
-    "gpio": "*"
+    "gpio": "*",
     "nomnom": "*"
   },  
   "bin": {
